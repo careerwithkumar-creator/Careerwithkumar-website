@@ -1,26 +1,94 @@
 @import "tailwindcss";
+@config "../../tailwind.config.ts";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #F6F7F9;
+  --surface: #FFFFFF;
+  --border: #E2E5EA;
+  --border-soft: #EDEFF2;
+  --navy: #132A4C;
+  --navy-2: #1D3A63;
+  --blue: #1A56DB;
+  --blue-soft: #EAF1FD;
+  --text: #1A2333;
+  --text-2: #5B6472;
+  --text-3: #8992A0;
+  --green: #1E8E5A;
+  --green-soft: #E7F5EE;
+  --amber: #B4740E;
+  --amber-soft: #FBF1DF;
+  --red: #C0392B;
+  --red-soft: #FBECEA;
+  /* Introduced by the reference mockup for the "internship" tag — not in
+     the original documented palette, added here to match it exactly. */
+  --purple: #6B3FA0;
+  --purple-soft: #F1EAFB;
+  /* Soft navy tag background, for the "walk-in" category — the mockup's
+     job examples don't include a walk-in tag, so this extends its tag
+     family (soft-bg + solid-text pairs) consistently for the 5th category. */
+  --navy-soft: #E4E9F1;
+  /* Text-on-navy-soft-pill color — kept separate from --navy-2 (which is a
+     button hover-darken background) because the two need to move in
+     opposite directions in dark mode: hover-darken stays dark, but pill
+     text needs to go light to stay readable on a dark pill. */
+  --navy-text: #1D3A63;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Dark palette as specified; --border-soft, --navy-2, --purple(-soft) and
+   --navy-soft aren't part of the given spec (only the core tokens were) —
+   derived here at the same tint depth as the given --blue-soft so every
+   pill/badge/hover-state keeps working without a per-component rewrite. */
+:root[data-theme="dark"] {
+  --bg: #0A0D14;
+  --surface: #11151F;
+  --border: #232A3A;
+  --border-soft: #1A2030;
+  --navy: #11151F;
+  --navy-2: #1B2740;
+  --blue: #3E7BFA;
+  --blue-soft: #1B2A4D;
+  --text: #E7EAF2;
+  --text-2: #9BA3B7;
+  --text-3: #5E6779;
+  --green: #3FC97F;
+  --green-soft: #15301F;
+  --amber: #E2921E;
+  --amber-soft: #3A2A12;
+  --red: #EF5350;
+  --red-soft: #3A1918;
+  --purple: #9B7FD4;
+  --purple-soft: #2A2050;
+  --navy-soft: #1C2333;
+  --navy-text: #A9B8D6;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-color: var(--border);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-inter), -apple-system, system-ui, sans-serif;
+}
+
+@layer components {
+  .input {
+    @apply w-full rounded-md border border-border bg-surface p-2 text-sm text-text placeholder:text-text-3 focus:border-blue focus:outline-none;
+  }
+}
+
+/* Theme-conditional visibility (logo swap, sun/moon toggle icon) — plain CSS
+   attribute selectors rather than React state, so there's no client/server
+   markup difference to mismatch during hydration. display:contents keeps
+   the wrapper out of flex/grid layout when shown. */
+.theme-only-light,
+.theme-only-dark {
+  display: contents;
+}
+:root[data-theme="dark"] .theme-only-light {
+  display: none;
+}
+:root:not([data-theme="dark"]) .theme-only-dark {
+  display: none;
 }

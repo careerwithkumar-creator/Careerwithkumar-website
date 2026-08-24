@@ -1,0 +1,12 @@
+<svg width="480" height="140" viewBox="0 0 480 140" xmlns="http://www.w3.org/2000/svg">
+  <!-- icon -->
+  <rect x="8" y="18" width="104" height="104" rx="24" fill="#132A4C"/>
+  <text x="60" y="83" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="42" fill="#FFFFFF" letter-spacing="1">CK</text>
+  <circle cx="94" cy="98" r="16" fill="#FFFFFF"/>
+  <circle cx="94" cy="98" r="13" fill="#1A56DB"/>
+  <path d="M88 98l4.2 4.2 9-9" stroke="#FFFFFF" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- wordmark -->
+  <text x="132" y="82" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="40" fill="#1A2333" letter-spacing="-0.5">Careerwithkumar</text>
+  <text x="133" y="104" font-family="Arial, Helvetica, sans-serif" font-weight="600" font-size="13" fill="#1A56DB" letter-spacing="2">VERIFIED JOB UPDATES</text>
+</svg>
