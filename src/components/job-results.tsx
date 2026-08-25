@@ -3,11 +3,20 @@
 import { useMemo, useState } from "react";
 import { JobFeed } from "@/components/job-feed";
 import { SaveSearchButton } from "@/components/save-search-button";
-import { GridIcon, ListIcon, FilterIcon, ChevronDownIcon, XIcon } from "@/components/icons";
+import {
+  GridIcon,
+  ListIcon,
+  FilterIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
+  XIcon,
+} from "@/components/icons";
 import { CATEGORY_META, CATEGORY_ORDER } from "@/lib/categories";
 import type { JobCategory, JobPost } from "@/types/database";
 
 type SortKey = "newest" | "deadline" | "views";
+
+const PAGE_SIZE = 16;
 
 const SORT_LABELS: Record<SortKey, string> = {
   newest: "Newest",
@@ -42,6 +51,7 @@ export function JobResults({ jobs }: { jobs: JobPost[] }) {
   const [locationFilter, setLocationFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<JobCategory | "">("");
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [page, setPage] = useState(1);
 
   const locations = useMemo(() => {
     const set = new Set(jobs.map((j) => j.location).filter((l): l is string => !!l));
@@ -54,6 +64,26 @@ export function JobResults({ jobs }: { jobs: JobPost[] }) {
     if (categoryFilter) result = result.filter((j) => j.category === categoryFilter);
     return sortJobs(result, sortBy);
   }, [jobs, locationFilter, categoryFilter, sortBy]);
+
+  function updateLocationFilter(value: string) {
+    setLocationFilter(value);
+    setPage(1);
+  }
+  function updateCategoryFilter(value: JobCategory | "") {
+    setCategoryFilter(value);
+    setPage(1);
+  }
+  function updateSortBy(value: SortKey) {
+    setSortBy(value);
+    setPage(1);
+  }
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const paginated = filtered.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
 
   return (
     <div>
@@ -93,7 +123,7 @@ export function JobResults({ jobs }: { jobs: JobPost[] }) {
             <span className="sr-only">Sort by</span>
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as SortKey)}
+              onChange={(e) => updateSortBy(e.target.value as SortKey)}
               className="appearance-none rounded-md border border-border bg-surface py-2 pr-8 pl-3 text-[13px] font-medium text-text-2 focus:border-blue focus:outline-none"
             >
               {(Object.keys(SORT_LABELS) as SortKey[]).map((key) => (
@@ -111,7 +141,7 @@ export function JobResults({ jobs }: { jobs: JobPost[] }) {
         <div className="flex flex-wrap items-center gap-2.5">
           <select
             value={locationFilter}
-            onChange={(e) => setLocationFilter(e.target.value)}
+            onChange={(e) => updateLocationFilter(e.target.value)}
             className="hidden rounded-md border border-border bg-surface px-3 py-1.75 text-[13px] text-text-2 focus:border-blue focus:outline-none sm:block"
           >
             <option value="">All locations</option>
@@ -124,7 +154,7 @@ export function JobResults({ jobs }: { jobs: JobPost[] }) {
 
           <select
             value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value as JobCategory | "")}
+            onChange={(e) => updateCategoryFilter(e.target.value as JobCategory | "")}
             className="hidden rounded-md border border-border bg-surface px-3 py-1.75 text-[13px] text-text-2 focus:border-blue focus:outline-none sm:block"
           >
             <option value="">All categories</option>
@@ -149,8 +179,48 @@ export function JobResults({ jobs }: { jobs: JobPost[] }) {
       </div>
 
       <div className="mt-5">
-        <JobFeed jobs={filtered} layout={layout} />
+        <JobFeed jobs={paginated} layout={layout} />
       </div>
+
+      {totalPages > 1 && (
+        <div className="mt-6 flex items-center justify-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            aria-label="Previous page"
+            className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-surface text-text-2 transition-colors hover:border-blue hover:text-blue disabled:pointer-events-none disabled:opacity-40"
+          >
+            <ChevronRightIcon className="h-3.5 w-3.5 rotate-180" />
+          </button>
+
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+            <button
+              key={p}
+              type="button"
+              onClick={() => setPage(p)}
+              aria-current={p === currentPage ? "page" : undefined}
+              className={`flex h-8 w-8 items-center justify-center rounded-md text-[13px] font-medium transition-colors ${
+                p === currentPage
+                  ? "bg-blue text-white"
+                  : "border border-border bg-surface text-text-2 hover:border-blue hover:text-blue"
+              }`}
+            >
+              {p}
+            </button>
+          ))}
+
+          <button
+            type="button"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            aria-label="Next page"
+            className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-surface text-text-2 transition-colors hover:border-blue hover:text-blue disabled:pointer-events-none disabled:opacity-40"
+          >
+            <ChevronRightIcon className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
 
       {filtersOpen && (
         <div
@@ -180,7 +250,7 @@ export function JobResults({ jobs }: { jobs: JobPost[] }) {
                 </span>
                 <select
                   value={locationFilter}
-                  onChange={(e) => setLocationFilter(e.target.value)}
+                  onChange={(e) => updateLocationFilter(e.target.value)}
                   className="input"
                 >
                   <option value="">All locations</option>
@@ -199,7 +269,7 @@ export function JobResults({ jobs }: { jobs: JobPost[] }) {
                 <select
                   value={categoryFilter}
                   onChange={(e) =>
-                    setCategoryFilter(e.target.value as JobCategory | "")
+                    updateCategoryFilter(e.target.value as JobCategory | "")
                   }
                   className="input"
                 >
