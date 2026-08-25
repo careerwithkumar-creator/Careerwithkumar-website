@@ -5,6 +5,7 @@ import { NavDropdown } from "@/components/nav-dropdown";
 import { SavedJobsBadge } from "@/components/saved-jobs-badge";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { GetAlertsButton } from "@/components/get-alerts-button";
+import { HeaderAuthSlot } from "@/components/header-auth";
 import { CATEGORY_META, CATEGORY_ORDER } from "@/lib/categories";
 
 const JOB_SEEKER_ITEMS = [
@@ -47,22 +48,25 @@ export function Header() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-6 md:flex">
-          <NavDropdown label="Browse jobs" items={browseJobsItems} />
-          <NavDropdown label="For job seekers" items={JOB_SEEKER_ITEMS} />
-          <NavDropdown label="Resources" items={RESOURCE_ITEMS} />
-          <Link
-            href="/about"
-            className="text-[13.5px] font-medium text-text-2 transition-colors hover:text-text"
-          >
-            About us
-          </Link>
-        </nav>
+        <div className="flex flex-1 flex-wrap items-center justify-end gap-x-6 gap-y-3">
+          <nav className="hidden items-center gap-6 md:flex">
+            <NavDropdown label="Browse jobs" items={browseJobsItems} />
+            <NavDropdown label="For job seekers" items={JOB_SEEKER_ITEMS} />
+            <NavDropdown label="Resources" items={RESOURCE_ITEMS} />
+            <Link
+              href="/about"
+              className="text-[13.5px] font-medium text-text-2 transition-colors hover:text-text"
+            >
+              About us
+            </Link>
+          </nav>
 
-        <div className="flex items-center gap-2.5">
-          <SavedJobsBadge />
-          <ThemeToggle />
-          <GetAlertsButton />
+          <div className="flex items-center gap-2.5">
+            <SavedJobsBadge />
+            <ThemeToggle />
+            <GetAlertsButton />
+            <HeaderAuthSlot />
+          </div>
         </div>
       </div>
     </header>

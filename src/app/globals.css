@@ -78,6 +78,20 @@ body {
   }
 }
 
+@keyframes auth-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.auth-card {
+  animation: auth-card-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 /* Theme-conditional visibility (logo swap, sun/moon toggle icon) — plain CSS
    attribute selectors rather than React state, so there's no client/server
    markup difference to mismatch during hydration. display:contents keeps
