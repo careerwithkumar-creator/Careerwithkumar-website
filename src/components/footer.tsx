@@ -13,7 +13,7 @@ const LEGAL_LINKS = [
   { href: "/terms", label: "Terms of use" },
   { href: "/contact?topic=scam", label: "Report a scam" },
 ];
-
+//checking comment
 export function Footer() {
   const { instagram, whatsapp, telegram } = SITE_CONFIG.social;
   const followLinks = [
