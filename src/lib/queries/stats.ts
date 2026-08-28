@@ -1,4 +1,6 @@
+import { unstable_cache } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 
 // Stats are decorative — if Supabase hiccups (a transient auth/network
 // error), fall back to 0 rather than taking down a whole page over a number
@@ -23,16 +25,23 @@ export async function safeStat(fn: () => Promise<number>): Promise<number> {
   }
 }
 
-export async function getPublishedJobCount(): Promise<number> {
-  const supabase = await createClient();
-  const { count, error } = await supabase
-    .from("job_posts")
-    .select("*", { count: "exact", head: true })
-    .eq("status", "published");
+// Covered by the same public RLS policy as the job list reads — cookie-free
+// client so this can be cached across visitors instead of counted on every
+// page load.
+export const getPublishedJobCount = unstable_cache(
+  async (): Promise<number> => {
+    const supabase = createPublicClient();
+    const { count, error } = await supabase
+      .from("job_posts")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "published");
 
-  if (error) throw new Error(error.message);
-  return count ?? 0;
-}
+    if (error) throw new Error(error.message);
+    return count ?? 0;
+  },
+  ["published-job-count"],
+  { tags: ["jobs"], revalidate: 60 },
+);
 
 export async function getReadingNowCount(): Promise<number> {
   const supabase = await createClient();

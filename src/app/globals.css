@@ -4,24 +4,24 @@
 :root {
   --bg: #F6F7F9;
   --surface: #FFFFFF;
-  --border: #E2E5EA;
-  --border-soft: #EDEFF2;
-  --navy: #132A4C;
-  --navy-2: #1D3A63;
-  --blue: #1A56DB;
-  --blue-soft: #EAF1FD;
-  --text: #1A2333;
-  --text-2: #5B6472;
-  --text-3: #8992A0;
-  --green: #1E8E5A;
-  --green-soft: #E7F5EE;
-  --amber: #B4740E;
+  --border: #D9DEE5;
+  --border-soft: #E6EAEF;
+  --navy: #172B4D;
+  --navy-2: #0F1F38;
+  --blue: #2F6FAD;
+  --blue-soft: #EAF2F8;
+  --text: #17202A;
+  --text-2: #667085;
+  --text-3: #98A2B3;
+  --green: #27864B;
+  --green-soft: #E7F5EC;
+  --amber: #B45309;
   --amber-soft: #FBF1DF;
-  --red: #C0392B;
-  --red-soft: #FBECEA;
+  --red: #D64545;
+  --red-soft: #FCEBEA;
   /* Introduced by the reference mockup for the "internship" tag — not in
      the original documented palette, added here to match it exactly. */
-  --purple: #6B3FA0;
+  --purple: #6D4AA6;
   --purple-soft: #F1EAFB;
   /* Soft navy tag background, for the "walk-in" category — the mockup's
      job examples don't include a walk-in tag, so this extends its tag
@@ -39,22 +39,22 @@
    derived here at the same tint depth as the given --blue-soft so every
    pill/badge/hover-state keeps working without a per-component rewrite. */
 :root[data-theme="dark"] {
-  --bg: #0A0D14;
-  --surface: #11151F;
-  --border: #232A3A;
-  --border-soft: #1A2030;
-  --navy: #11151F;
-  --navy-2: #1B2740;
-  --blue: #3E7BFA;
-  --blue-soft: #1B2A4D;
+  --bg: #0D1117;
+  --surface: #141A24;
+  --border: #262E3D;
+  --border-soft: #1B212D;
+  --navy: #141A24;
+  --navy-2: #1D2A40;
+  --blue: #5B9BD5;
+  --blue-soft: #1B2A3F;
   --text: #E7EAF2;
   --text-2: #9BA3B7;
   --text-3: #5E6779;
-  --green: #3FC97F;
+  --green: #3FA968;
   --green-soft: #15301F;
-  --amber: #E2921E;
+  --amber: #C88A3A;
   --amber-soft: #3A2A12;
-  --red: #EF5350;
+  --red: #E05252;
   --red-soft: #3A1918;
   --purple: #9B7FD4;
   --purple-soft: #2A2050;

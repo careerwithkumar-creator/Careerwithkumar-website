@@ -26,6 +26,28 @@ export type JobPost = {
   updated_at: string;
 };
 
+// Column subset used by job listing UI (cards, feed, results). Selecting only
+// these in list queries avoids shipping full `description`/`eligibility`
+// text — which the list UI never renders — down to the browser.
+export type JobListItem = Pick<
+  JobPost,
+  | "id"
+  | "slug"
+  | "title"
+  | "company"
+  | "location"
+  | "category"
+  | "source"
+  | "salary"
+  | "deadline_at"
+  | "view_count"
+  | "published_at"
+  | "created_at"
+>;
+
+export const JOB_LIST_COLUMNS =
+  "id, slug, title, company, location, category, source, salary, deadline_at, view_count, published_at, created_at";
+
 export type PostView = {
   id: string;
   job_post_id: string;

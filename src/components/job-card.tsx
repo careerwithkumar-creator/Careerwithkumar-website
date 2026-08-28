@@ -1,17 +1,13 @@
 import Link from "next/link";
-import type { JobPost } from "@/types/database";
+import type { JobListItem } from "@/types/database";
 import { SaveButton } from "@/components/save-button";
-import { MapPinIcon, BriefcaseIcon, InfoIcon } from "@/components/icons";
-import { formatDate } from "@/lib/format";
+import { CategoryTag, DeadlineBadge, URGENCY_TEXT_CLASS } from "@/components/badges";
+import { MapPinIcon, BriefcaseIcon, CalendarIcon, InfoIcon } from "@/components/icons";
+import { formatDate, getDeadlineInfo } from "@/lib/format";
 import { CATEGORY_META } from "@/lib/categories";
 
-function daysUntil(iso: string): number {
-  return Math.ceil((new Date(iso).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-}
-
-export function JobCard({ job }: { job: JobPost }) {
-  const daysLeft = job.deadline_at ? daysUntil(job.deadline_at) : null;
-  const isUrgent = daysLeft !== null && daysLeft >= 0 && daysLeft <= 3;
+export function JobCard({ job }: { job: JobListItem }) {
+  const deadlineInfo = getDeadlineInfo(job.deadline_at);
 
   return (
     <article className="rounded-xl border border-border bg-surface p-5 transition-colors hover:border-blue">
@@ -40,23 +36,32 @@ export function JobCard({ job }: { job: JobPost }) {
         </div>
       </div>
 
+      {job.salary && (
+        <p className="mt-3 text-[15px] font-semibold text-green">
+          {job.salary}
+        </p>
+      )}
+
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <CategoryTag category={job.category} />
+        <DeadlineBadge deadlineAt={job.deadline_at} />
+      </div>
+
       <div className="mt-4 flex items-center justify-between border-t border-border-soft pt-3.5">
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-text-3">
-            {formatDate(job.published_at ?? job.created_at)}
-          </span>
-          {isUrgent && (
-            <span className="rounded-md bg-red-soft px-1.75 py-0.5 text-[11px] font-semibold text-red">
-              {daysLeft === 0 ? "Closes today" : `${daysLeft}d left`}
-            </span>
-          )}
+        <div
+          className={`flex items-center gap-1.5 text-xs ${deadlineInfo ? URGENCY_TEXT_CLASS[deadlineInfo.urgency] : "text-text-3"}`}
+        >
+          <CalendarIcon className="h-3.5 w-3.5 shrink-0" />
+          {job.deadline_at
+            ? `Deadline: ${formatDate(job.deadline_at)}`
+            : "No deadline specified"}
         </div>
 
         <div className="group relative">
           <Link
             href={`/jobs/${job.slug}`}
             aria-label={`View details for ${job.title}`}
-            className="block text-blue hover:text-navy-2"
+            className="block text-blue hover:text-text"
           >
             <InfoIcon className="h-5 w-5" />
           </Link>

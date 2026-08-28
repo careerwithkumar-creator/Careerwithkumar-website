@@ -21,9 +21,20 @@ export function CategoryTag({ category }: { category: JobCategory }) {
 }
 
 const URGENCY_CLASS: Record<string, string> = {
-  soon: "bg-red-soft text-red",
+  open: "bg-green-soft text-green",
   ok: "bg-amber-soft text-amber",
+  soon: "bg-red-soft text-red",
   closed: "bg-border-soft text-text-3",
+};
+
+// Text-only equivalent of URGENCY_CLASS — for a deadline row that isn't
+// pill-shaped (e.g. JobCard's calendar-icon date line), which still needs
+// to read as urgent without a background chip.
+export const URGENCY_TEXT_CLASS: Record<string, string> = {
+  open: "text-text-3",
+  ok: "text-amber",
+  soon: "text-red",
+  closed: "text-text-3",
 };
 
 export function DeadlineBadge({ deadlineAt }: { deadlineAt: string | null }) {

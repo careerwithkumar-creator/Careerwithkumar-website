@@ -14,7 +14,20 @@ import {
   BriefcaseIcon,
 } from "@/components/icons";
 import { formatCount, formatRelativeTime } from "@/lib/format";
-import { getJobBySlug, getRelatedJobs } from "@/lib/queries/jobs";
+import { getJobBySlug, getRelatedJobs, getPublishedJobs } from "@/lib/queries/jobs";
+
+// Pre-render every currently-published job at build time, so the first
+// visitor to any job that already existed at deploy time gets a static page
+// instantly instead of triggering the render themselves. Jobs published
+// after deploy fall back to on-demand rendering on their first request (see
+// the cache-warming fetch in the admin publish/update actions for how that
+// gap is closed), then stay cached as a static page for `revalidate` seconds.
+export async function generateStaticParams() {
+  const jobs = await getPublishedJobs();
+  return jobs.map((job) => ({ slug: job.slug }));
+}
+
+export const revalidate = 300;
 
 export async function generateMetadata({
   params,
