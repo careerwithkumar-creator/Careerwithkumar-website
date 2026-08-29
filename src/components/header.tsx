@@ -4,7 +4,6 @@ import { VerifiedBadge } from "@/components/badges";
 import { NavDropdown } from "@/components/nav-dropdown";
 import { SavedJobsBadge } from "@/components/saved-jobs-badge";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { GetAlertsButton } from "@/components/get-alerts-button";
 import { HeaderAuthSlot } from "@/components/header-auth";
 import { CATEGORY_META, CATEGORY_ORDER } from "@/lib/categories";
 
@@ -53,7 +52,6 @@ export function Header() {
           <div className="flex items-center gap-2.5">
             <SavedJobsBadge />
             <ThemeToggle />
-            <GetAlertsButton />
             <HeaderAuthSlot />
           </div>
         </div>
