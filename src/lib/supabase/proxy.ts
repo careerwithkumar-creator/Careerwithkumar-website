@@ -1,9 +1,9 @@
 import { createServerClient } from "@supabase/ssr";
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse, type NextRequest, type NextFetchEvent } from "next/server";
 
 const SESSION_COOKIE = "cwk_sid";
 
-export async function updateSession(request: NextRequest) {
+export async function updateSession(request: NextRequest, event: NextFetchEvent) {
   const hasSessionCookie = request.cookies.has(SESSION_COOKIE);
   const sessionId = hasSessionCookie
     ? request.cookies.get(SESSION_COOKIE)!.value
@@ -32,7 +32,7 @@ export async function updateSession(request: NextRequest) {
     });
   }
 
-  await recordJobViewOnce(request, response, path, sessionId);
+  recordJobViewOnce(event, request, response, path, sessionId);
 
   return response;
 }
@@ -98,7 +98,12 @@ async function handleAdminAuth(request: NextRequest, path: string) {
 // because only middleware/route handlers can set a cookie ahead of the
 // response — this keeps the increment on the initial page load, with no
 // client-side round trip, and de-dupes refreshes for 24h via a per-slug cookie.
-async function recordJobViewOnce(
+//
+// The actual write is handed to `event.waitUntil` so it runs in the
+// background instead of blocking the response: the DB call has nothing to do
+// with what the visitor is waiting to see, so it must not sit in front of it.
+function recordJobViewOnce(
+  event: NextFetchEvent,
   request: NextRequest,
   response: NextResponse,
   path: string,
@@ -117,8 +122,8 @@ async function recordJobViewOnce(
   const viewedCookie = `cwk_viewed_${slug}`;
   if (request.cookies.has(viewedCookie)) return;
 
-  try {
-    await fetch(`${supabaseUrl}/rest/v1/rpc/record_post_view_by_slug`, {
+  event.waitUntil(
+    fetch(`${supabaseUrl}/rest/v1/rpc/record_post_view_by_slug`, {
       method: "POST",
       headers: {
         apikey: supabaseAnonKey,
@@ -126,10 +131,10 @@ async function recordJobViewOnce(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ p_slug: slug, p_session_id: sessionId }),
-    });
-  } catch {
-    // View counting is best-effort; never block the page on it.
-  }
+    }).catch(() => {
+      // View counting is best-effort; never fail the request over it.
+    }),
+  );
 
   response.cookies.set(viewedCookie, "1", {
     maxAge: 60 * 60 * 24,

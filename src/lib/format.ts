@@ -15,9 +15,9 @@ export function formatRelativeTime(iso: string): string {
   });
 }
 
-// Two states only, matching the reference mockup's .deadline-badge:
-// "soon" (red) within a week, "ok" (amber) beyond that.
-export type DeadlineUrgency = "soon" | "ok" | "closed";
+// Four states: "closed" (past deadline), "soon" (closing within 3 days),
+// "ok" (closing within two weeks), "open" (plenty of time left).
+export type DeadlineUrgency = "open" | "ok" | "soon" | "closed";
 
 export function getDeadlineInfo(iso: string | null): {
   label: string;
@@ -30,11 +30,10 @@ export function getDeadlineInfo(iso: string | null): {
   );
 
   if (diffDays < 0) return { label: "Closed", urgency: "closed" };
-  if (diffDays === 0) return { label: "Closes today", urgency: "soon" };
-  if (diffDays === 1) return { label: "1 day left", urgency: "soon" };
-  if (diffDays <= 7)
-    return { label: `${diffDays} days left`, urgency: "soon" };
-  return { label: `${diffDays} days left`, urgency: "ok" };
+  if (diffDays === 0) return { label: "Closing today", urgency: "soon" };
+  if (diffDays <= 3) return { label: "Closing Soon", urgency: "soon" };
+  if (diffDays <= 14) return { label: "Apply Soon", urgency: "ok" };
+  return { label: "Application Open", urgency: "open" };
 }
 
 export function formatDate(iso: string): string {

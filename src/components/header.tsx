@@ -29,18 +29,7 @@ export function Header() {
 
   return (
     <header className="border-b border-border bg-surface">
-      <div className="border-b border-border-soft">
-        <div className="mx-auto flex max-w-270 justify-end px-5 py-1.5">
-          <Link
-            href="/contact"
-            className="text-xs font-medium text-text-3 hover:text-blue"
-          >
-            Contact us
-          </Link>
-        </div>
-      </div>
-
-      <div className="mx-auto flex max-w-270 flex-wrap items-center justify-between gap-4 px-5 py-3">
+      <div className="mx-auto flex max-w-350 flex-wrap items-center justify-between gap-4 px-5 py-3">
         <Link href="/" className="flex flex-col gap-1">
           <Logo className="h-20 w-auto" />
           <span className="hidden sm:block">

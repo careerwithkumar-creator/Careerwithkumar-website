@@ -1,11 +1,11 @@
-import type { JobPost } from "@/types/database";
+import type { JobListItem } from "@/types/database";
 import { JobCard } from "@/components/job-card";
 
 export function JobFeed({
   jobs,
   layout = "grid",
 }: {
-  jobs: JobPost[];
+  jobs: JobListItem[];
   layout?: "grid" | "list";
 }) {
   if (jobs.length === 0) {
@@ -22,7 +22,7 @@ export function JobFeed({
     <div
       className={
         layout === "grid"
-          ? "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          ? "grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3"
           : "flex flex-col gap-3"
       }
     >

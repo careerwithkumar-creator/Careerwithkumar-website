@@ -1,14 +1,28 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getJobBySlug } from "@/lib/queries/jobs";
 import { jobPostSchema, slugify } from "@/lib/schemas/job-post";
 
 export type JobFormState = {
   error: string | null;
   fieldErrors?: Record<string, string>;
 };
+
+// Runs the same cached lookup a visitor's page render would, right here in
+// the admin action — one direct Supabase read, no HTTP round trip back into
+// the app. It populates the shared query cache so the next real visitor's
+// render finds the data already there instead of querying live.
+async function warmJobCache(slug: string) {
+  try {
+    await getJobBySlug(slug);
+  } catch {
+    // Best-effort: if this fails, the first real visitor just triggers the
+    // query normally, same as before this existed.
+  }
+}
 
 function parseForm(formData: FormData) {
   return jobPostSchema.safeParse({
@@ -59,6 +73,8 @@ export async function createJobPost(
     return { error: error.message };
   }
 
+  updateTag("jobs");
+  if (data.status === "published") await warmJobCache(slug);
   revalidatePath("/admin");
   redirect("/admin");
 }
@@ -86,7 +102,7 @@ export async function updateJobPost(
 
   const { data: existing } = await supabase
     .from("job_posts")
-    .select("status, published_at")
+    .select("slug, status, published_at")
     .eq("id", jobId)
     .single();
 
@@ -107,6 +123,8 @@ export async function updateJobPost(
     return { error: error.message };
   }
 
+  updateTag("jobs");
+  if (data.status === "published" && existing?.slug) await warmJobCache(existing.slug);
   revalidatePath("/admin");
   redirect("/admin");
 }
@@ -115,5 +133,6 @@ export async function deleteJobPost(jobId: string) {
   const supabase = await createClient();
   const { error } = await supabase.from("job_posts").delete().eq("id", jobId);
   if (error) throw new Error(error.message);
+  updateTag("jobs");
   revalidatePath("/admin");
 }

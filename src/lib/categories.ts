@@ -4,7 +4,7 @@ export const CATEGORY_META: Record<
   JobCategory,
   { label: string; tagClass: string }
 > = {
-  govt: { label: "Government", tagClass: "bg-green-soft text-green" },
+  govt: { label: "Government", tagClass: "bg-blue-soft text-blue" },
   private: { label: "Private", tagClass: "bg-blue-soft text-blue" },
   internship: { label: "Internship", tagClass: "bg-purple-soft text-purple" },
   remote: { label: "Remote", tagClass: "bg-amber-soft text-amber" },

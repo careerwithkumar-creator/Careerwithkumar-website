@@ -12,7 +12,7 @@ import {
   XIcon,
 } from "@/components/icons";
 import { CATEGORY_META, CATEGORY_ORDER } from "@/lib/categories";
-import type { JobCategory, JobPost } from "@/types/database";
+import type { JobCategory, JobListItem } from "@/types/database";
 
 type SortKey = "newest" | "deadline" | "views";
 
@@ -24,7 +24,7 @@ const SORT_LABELS: Record<SortKey, string> = {
   views: "Most viewed",
 };
 
-function sortJobs(jobs: JobPost[], sortBy: SortKey): JobPost[] {
+function sortJobs(jobs: JobListItem[], sortBy: SortKey): JobListItem[] {
   const copy = [...jobs];
   if (sortBy === "views") {
     return copy.sort((a, b) => b.view_count - a.view_count);
@@ -45,7 +45,7 @@ function sortJobs(jobs: JobPost[], sortBy: SortKey): JobPost[] {
   );
 }
 
-export function JobResults({ jobs }: { jobs: JobPost[] }) {
+export function JobResults({ jobs }: { jobs: JobListItem[] }) {
   const [layout, setLayout] = useState<"grid" | "list">("grid");
   const [sortBy, setSortBy] = useState<SortKey>("newest");
   const [locationFilter, setLocationFilter] = useState("");

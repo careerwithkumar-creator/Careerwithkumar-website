@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { MetricCard } from "@/components/admin/metric-card";
 import { PostingsTable } from "@/components/admin/postings-table";
+import { AdminPagination } from "@/components/admin/pagination";
 import { LiveReadingNow } from "@/components/live-reading-now";
 import { isFlaggedForReview } from "@/components/badges";
 import { formatCount } from "@/lib/format";
@@ -16,21 +17,37 @@ import {
 
 export const metadata: Metadata = { title: "Dashboard — Careerwithkumar Admin" };
 
-export default async function AdminDashboardPage() {
+const PAGE_SIZE = 10;
+
+export default async function AdminDashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page } = await searchParams;
+
   const [jobs, viewsToday, readingNow, totalApplied] = await Promise.all([
     getAllJobsForAdmin(),
     safeStat(getViewsToday),
     safeStat(getReadingNowCount),
     safeStat(getTotalAppliedCount),
   ]);
-  const sparklines = await getHourlyViewBuckets(jobs.map((j) => j.id)).catch(
-    (error) => {
-      console.error("Sparkline query failed, falling back to empty:", error);
-      return {};
-    },
-  );
 
   const flaggedCount = jobs.filter(isFlaggedForReview).length;
+
+  const totalPages = Math.max(1, Math.ceil(jobs.length / PAGE_SIZE));
+  const currentPage = Math.min(Math.max(1, Number(page) || 1), totalPages);
+  const pageJobs = jobs.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
+
+  const sparklines = await getHourlyViewBuckets(
+    pageJobs.map((j) => j.id),
+  ).catch((error) => {
+    console.error("Sparkline query failed, falling back to empty:", error);
+    return {};
+  });
 
   return (
     <div>
@@ -59,7 +76,8 @@ export default async function AdminDashboardPage() {
         </Link>
       </div>
 
-      <PostingsTable jobs={jobs} sparklines={sparklines} />
+      <PostingsTable jobs={pageJobs} sparklines={sparklines} />
+      <AdminPagination currentPage={currentPage} totalPages={totalPages} />
     </div>
   );
 }

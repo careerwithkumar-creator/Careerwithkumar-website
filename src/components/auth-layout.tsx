@@ -20,14 +20,14 @@ export function AuthLayout({
 }) {
   return (
     <div className="flex min-h-full flex-1">
-      <div className="relative hidden w-[42%] shrink-0 overflow-hidden bg-[#132A4C] lg:flex lg:flex-col lg:justify-between lg:p-10">
+      <div className="relative hidden w-[42%] shrink-0 overflow-hidden bg-[#172B4D] lg:flex lg:flex-col lg:justify-between lg:p-10">
         <div
           aria-hidden
-          className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-[#3E7BFA] opacity-20 blur-3xl"
+          className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-[#2F6FAD] opacity-20 blur-3xl"
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute -bottom-32 -left-16 h-80 w-80 rounded-full bg-[#6B3FA0] opacity-20 blur-3xl"
+          className="pointer-events-none absolute -bottom-32 -left-16 h-80 w-80 rounded-full bg-[#6D4AA6] opacity-20 blur-3xl"
         />
 
         <Link href="/" className="relative">
@@ -42,9 +42,9 @@ export function AuthLayout({
             {HIGHLIGHTS.map((item) => (
               <li
                 key={item}
-                className="flex items-center gap-2.5 text-[13.5px] text-[#B9C6DA]"
+                className="flex items-center gap-2.5 text-[13.5px] text-[#B3BFD1]"
               >
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/10 text-[#3E7BFA]">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/10 text-[#6FA0C9]">
                   <CheckCircleIcon className="h-3.5 w-3.5" />
                 </span>
                 {item}
@@ -53,7 +53,7 @@ export function AuthLayout({
           </ul>
         </div>
 
-        <p className="relative text-[11.5px] text-[#7D90AC]">
+        <p className="relative text-[11.5px] text-[#7C8AA3]">
           © 2026 {SITE_CONFIG.name}. All rights reserved.
         </p>
       </div>
