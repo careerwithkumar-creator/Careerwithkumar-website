@@ -16,7 +16,7 @@ import type { JobCategory, JobListItem } from "@/types/database";
 
 type SortKey = "newest" | "deadline" | "views";
 
-const PAGE_SIZE = 16;
+const PAGE_SIZE = 15;
 
 const SORT_LABELS: Record<SortKey, string> = {
   newest: "Newest",

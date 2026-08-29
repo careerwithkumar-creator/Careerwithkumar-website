@@ -78,14 +78,20 @@ async function handleAdminAuth(request: NextRequest, path: string) {
     console.error("Supabase auth check failed in proxy:", error);
   }
 
-  if (path !== "/admin/login" && !user) {
+  // Being logged in isn't enough — public signup uses the same Supabase Auth
+  // as the admin panel, so any signed-up job seeker would otherwise pass a
+  // plain "is there a user" check. Only the configured admin email may in.
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const isAdmin = !!user && !!adminEmail && user.email === adminEmail;
+
+  if (path !== "/admin/login" && !isAdmin) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin/login";
     url.searchParams.set("next", path);
     return NextResponse.redirect(url);
   }
 
-  if (path === "/admin/login" && user) {
+  if (path === "/admin/login" && isAdmin) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin";
     return NextResponse.redirect(url);
