@@ -13,12 +13,14 @@ import {
   SunIcon,
   MoonIcon,
   TrendUpIcon,
+  CalendarIcon,
 } from "@/components/icons";
 import { signOut } from "@/app/admin/actions";
 
 const NAV_ITEMS = [
   { href: "/admin", label: "Dashboard", icon: BriefcaseIcon },
   { href: "/admin/analytics", label: "Analytics", icon: TrendUpIcon },
+  { href: "/admin/booking", label: "Booking", icon: CalendarIcon },
   { href: "/admin/jobs/new", label: "New posting", icon: PlusIcon },
 ];
 

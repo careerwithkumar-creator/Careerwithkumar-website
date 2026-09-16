@@ -5,6 +5,7 @@ import { NavDropdown } from "@/components/nav-dropdown";
 import { SavedJobsBadge } from "@/components/saved-jobs-badge";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { HeaderAuthSlot } from "@/components/header-auth";
+import { CalendarIcon } from "@/components/icons";
 import { CATEGORY_META, CATEGORY_ORDER } from "@/lib/categories";
 
 const JOB_SEEKER_ITEMS = [
@@ -50,6 +51,13 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-2.5">
+            <Link
+              href="/book"
+              className="shine-cta inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-[13px] font-semibold text-white transition-transform hover:scale-105"
+            >
+              <CalendarIcon className="h-3.75 w-3.75" />
+              Book a session
+            </Link>
             <SavedJobsBadge />
             <ThemeToggle />
             <HeaderAuthSlot />
