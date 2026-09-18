@@ -21,6 +21,12 @@ const RESOURCE_ITEMS = [
   { label: "Interview guide", href: "/about" },
 ];
 
+// Booking (including payment) is handled by Superprofile rather than the
+// site's own /book flow, which stays intact and reachable directly if that
+// ever changes.
+const BOOKING_LINK =
+  "https://superprofile.bio/bookings/careerwithtkumar?sessionId=6a9bf3d0feb4740013772036";
+
 export function Header() {
   const browseJobsItems = CATEGORY_ORDER.map((cat) => ({
     label: CATEGORY_META[cat].label,
@@ -51,13 +57,15 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-2.5">
-            <Link
-              href="/book"
+            <a
+              href={BOOKING_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
               className="shine-cta inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-[13px] font-semibold text-white transition-transform hover:scale-105"
             >
               <CalendarIcon className="h-3.75 w-3.75" />
               Book a session
-            </Link>
+            </a>
             <SavedJobsBadge />
             <ThemeToggle />
             <HeaderAuthSlot />
