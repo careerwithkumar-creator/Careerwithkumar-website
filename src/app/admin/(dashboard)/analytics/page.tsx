@@ -16,6 +16,11 @@ import {
   getTopViewedJobs,
   safeStat,
 } from "@/lib/queries/stats";
+import {
+  getBookingClicksToday,
+  getBookingClicksAllTime,
+  getDailyBookingClickCounts,
+} from "@/lib/queries/booking";
 
 export const metadata: Metadata = { title: "Analytics — Careerwithkumar Admin" };
 
@@ -29,6 +34,9 @@ export default async function AdminAnalyticsPage() {
     dailyViews,
     categoryCounts,
     topJobs,
+    bookingClicksToday,
+    bookingClicksAllTime,
+    dailyBookingClicks,
   ] = await Promise.all([
     safeStat(getViewsToday),
     safeStat(getTotalViewsAllTime),
@@ -44,6 +52,9 @@ export default async function AdminAnalyticsPage() {
       walkin: 0,
     })),
     getTopViewedJobs(5).catch(() => []),
+    safeStat(getBookingClicksToday),
+    safeStat(getBookingClicksAllTime),
+    getDailyBookingClickCounts(14).catch(() => []),
   ]);
 
   return (
@@ -67,11 +78,26 @@ export default async function AdminAnalyticsPage() {
           value={String(unresolvedReports)}
           tone={unresolvedReports > 0 ? "warn" : "default"}
         />
+        <MetricCard
+          label="Book clicks today"
+          value={formatCount(bookingClicksToday)}
+        />
+        <MetricCard
+          label="Book clicks all-time"
+          value={formatCount(bookingClicksAllTime)}
+        />
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
         <DailyViewsChart data={dailyViews} />
         <CategoryBreakdownChart counts={categoryCounts} />
+      </div>
+
+      <div className="mt-4">
+        <DailyViewsChart
+          data={dailyBookingClicks}
+          title={`"Book a session" clicks — last ${dailyBookingClicks.length} days`}
+        />
       </div>
 
       <div className="mt-6 rounded-lg border border-border bg-surface p-5">

@@ -23,9 +23,10 @@ const RESOURCE_ITEMS = [
 
 // Booking (including payment) is handled by Superprofile rather than the
 // site's own /book flow, which stays intact and reachable directly if that
-// ever changes.
-const BOOKING_LINK =
-  "https://superprofile.bio/bookings/careerwithtkumar?sessionId=6a9bf3d0feb4740013772036";
+// ever changes. Routed through /go/book-session (not a direct external
+// link) so each click gets recorded before continuing on — see that route
+// for the actual Superprofile URL.
+const BOOKING_LINK = "/go/book-session";
 
 export function Header() {
   const browseJobsItems = CATEGORY_ORDER.map((cat) => ({

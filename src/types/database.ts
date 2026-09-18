@@ -113,6 +113,12 @@ export type BookingSettings = {
   updated_at: string;
 };
 
+export type BookingClickEvent = {
+  id: string;
+  clicked_at: string;
+  session_id: string | null;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -175,6 +181,14 @@ export type Database = {
         Row: BookingSettings;
         Insert: BookingSettings;
         Update: Partial<BookingSettings>;
+        Relationships: [];
+      };
+      booking_click_events: {
+        Row: BookingClickEvent;
+        Insert: Omit<BookingClickEvent, "id" | "clicked_at"> & {
+          clicked_at?: string;
+        };
+        Update: Partial<BookingClickEvent>;
         Relationships: [];
       };
     };

@@ -4,8 +4,10 @@ import { useState } from "react";
 
 export function DailyViewsChart({
   data,
+  title,
 }: {
   data: { date: string; count: number }[];
+  title?: string;
 }) {
   const [hovered, setHovered] = useState<number | null>(null);
   const max = Math.max(1, ...data.map((d) => d.count));
@@ -13,7 +15,7 @@ export function DailyViewsChart({
   return (
     <div className="rounded-lg border border-border bg-surface p-5">
       <h3 className="text-sm font-semibold text-text">
-        Views — last {data.length} days
+        {title ?? `Views — last ${data.length} days`}
       </h3>
 
       <div className="mt-5 flex h-36 items-end gap-1.25">
