@@ -5,11 +5,11 @@ export const SITE_CONFIG = {
   description:
     "Verified job, internship, and walk-in notifications — govt, private, remote.",
   contactEmail: "careerwithkumar@gmail.com",
-  instagramFollowers: 20000, // TODO: not derivable from our DB — update by hand as it grows
+  instagramFollowers: 57000, // TODO: not derivable from our DB — update by hand as it grows
   social: {
-    instagram: null as string | null, // TODO: e.g. "https://instagram.com/careerwithkumar"
-    instagramHandle: null as string | null, // TODO: e.g. "@careerwithkumar"
-    whatsapp: null as string | null, // TODO: channel/group link or number
+    instagram: "https://www.instagram.com/careerwithkumar?stkn=YTRiczg1YjRvYW0w&utm_source=qr" as string | null,
+    instagramHandle: "@careerwithkumar" as string | null,
+    whatsapp: "https://whatsapp.com/channel/0029VbDeAno1NCrKoMlRHH1A" as string | null,
     telegram: null as string | null, // TODO: link, or leave null to hide
   },
 };

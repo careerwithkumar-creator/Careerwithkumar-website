@@ -3,6 +3,7 @@ import { JobResults } from "@/components/job-results";
 import { JobsSidebar } from "@/components/jobs-sidebar";
 import { TrustStrip } from "@/components/trust-strip";
 import { InstagramFollowStrip } from "@/components/instagram-follow-strip";
+import { FaqSection } from "@/components/faq-section";
 import { getPublishedJobs, getRecentJobUpdates } from "@/lib/queries/jobs";
 import { getPublishedJobCount, safeStat } from "@/lib/queries/stats";
 
@@ -26,11 +27,12 @@ export default async function Home() {
           <div className="mt-8">
             <InstagramFollowStrip />
           </div>
-
         </div>
 
         <JobsSidebar recentUpdates={recentUpdates} />
       </div>
+
+      <FaqSection />
 
       {/* <TrustStrip /> */}
     </div>

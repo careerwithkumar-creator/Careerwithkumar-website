@@ -5,6 +5,7 @@ import { NavDropdown } from "@/components/nav-dropdown";
 import { SavedJobsBadge } from "@/components/saved-jobs-badge";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { HeaderAuthSlot } from "@/components/header-auth";
+import { CalendarIcon } from "@/components/icons";
 import { CATEGORY_META, CATEGORY_ORDER } from "@/lib/categories";
 
 const JOB_SEEKER_ITEMS = [
@@ -19,6 +20,12 @@ const RESOURCE_ITEMS = [
   { label: "Resume tips", href: "/about" },
   { label: "Interview guide", href: "/about" },
 ];
+
+// Booking (including payment) is handled by Superprofile rather than the
+// site's own /book flow, which stays intact and reachable directly if that
+// ever changes.
+const BOOKING_LINK =
+  "https://superprofile.bio/bookings/careerwithtkumar?sessionId=6a9bf3d0feb4740013772036";
 
 export function Header() {
   const browseJobsItems = CATEGORY_ORDER.map((cat) => ({
@@ -50,6 +57,15 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-2.5">
+            <a
+              href={BOOKING_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shine-cta inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-[13px] font-semibold text-white transition-transform hover:scale-105"
+            >
+              <CalendarIcon className="h-3.75 w-3.75" />
+              Book a session
+            </a>
             <SavedJobsBadge />
             <ThemeToggle />
             <HeaderAuthSlot />

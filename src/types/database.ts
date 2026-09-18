@@ -83,6 +83,36 @@ export type PostPresence = {
   last_seen_at: string;
 };
 
+export type BookingAvailabilityRule = {
+  id: string;
+  day_of_week: number; // 0 = Sunday .. 6 = Saturday
+  start_time: string; // "HH:MM:SS", IST wall-clock
+  end_time: string;
+  slot_duration_minutes: number;
+  is_active: boolean;
+  created_at: string;
+};
+
+export type BookingStatus = "confirmed" | "cancelled";
+
+export type SessionBooking = {
+  id: string;
+  slot_start: string;
+  slot_end: string;
+  name: string;
+  email: string;
+  notes: string | null;
+  status: BookingStatus;
+  meet_link: string | null;
+  created_at: string;
+};
+
+export type BookingSettings = {
+  id: number;
+  meet_link: string | null;
+  updated_at: string;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -123,6 +153,28 @@ export type Database = {
         Row: PostPresence;
         Insert: PostPresence;
         Update: Partial<PostPresence>;
+        Relationships: [];
+      };
+      booking_availability_rules: {
+        Row: BookingAvailabilityRule;
+        Insert: Omit<BookingAvailabilityRule, "id" | "created_at"> & {
+          id?: string;
+        };
+        Update: Partial<BookingAvailabilityRule>;
+        Relationships: [];
+      };
+      session_bookings: {
+        Row: SessionBooking;
+        Insert: Omit<SessionBooking, "id" | "created_at" | "status"> & {
+          status?: BookingStatus;
+        };
+        Update: Partial<SessionBooking>;
+        Relationships: [];
+      };
+      booking_settings: {
+        Row: BookingSettings;
+        Insert: BookingSettings;
+        Update: Partial<BookingSettings>;
         Relationships: [];
       };
     };
