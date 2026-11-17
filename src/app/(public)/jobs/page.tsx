@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import { SearchBanner } from "@/components/search-banner";
 import { JobResults } from "@/components/job-results";
 import { JobsSidebar } from "@/components/jobs-sidebar";
-import { TrustStrip } from "@/components/trust-strip";
+
 import { getPublishedJobs, getRecentJobUpdates } from "@/lib/queries/jobs";
 import { getPublishedJobCount, safeStat } from "@/lib/queries/stats";
 import { CATEGORY_META } from "@/lib/categories";
 import type { JobCategory } from "@/types/database";
 
 const VALID_CATEGORIES = new Set<JobCategory>([
+  "apprenticeship",
   "govt",
   "private",
   "internship",
@@ -26,10 +27,20 @@ export async function generateMetadata({
   searchParams: Promise<{ category?: string }>;
 }): Promise<Metadata> {
   const { category } = await searchParams;
+  const shared: Metadata = {
+    description:
+      "Find government jobs, private jobs, internships and apprenticeships. Check official eligibility and application details.",
+    alternates: { canonical: "/jobs" },
+    openGraph: { title: "Jobs & Internships | CareerWithKumar", url: "/jobs" },
+    twitter: { card: "summary", title: "Jobs & Internships | CareerWithKumar" },
+  };
   if (isJobCategory(category)) {
-    return { title: `${CATEGORY_META[category].label} Jobs — Careerwithkumar` };
+    return {
+      ...shared,
+      title: `${CATEGORY_META[category].label} Jobs — Careerwithkumar`,
+    };
   }
-  return { title: "All Jobs — Careerwithkumar" };
+  return { ...shared, title: "All Jobs — Careerwithkumar" };
 }
 
 export default async function JobsPage({

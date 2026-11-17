@@ -184,6 +184,7 @@ export async function getCategoryBreakdown(): Promise<
     internship: 0,
     remote: 0,
     walkin: 0,
+    apprenticeship: 0,
   };
   for (const row of data ?? []) {
     counts[row.category] += 1;
@@ -193,7 +194,9 @@ export async function getCategoryBreakdown(): Promise<
 
 // Top jobs by view count — job_posts.view_count is a running total, so this
 // avoids re-aggregating post_views for a number we already keep on the row.
-export async function getTopViewedJobs(limit = 5): Promise<
+export async function getTopViewedJobs(
+  limit = 5,
+): Promise<
   { id: string; title: string; company: string; view_count: number }[]
 > {
   const supabase = await createClient();

@@ -22,9 +22,27 @@ import {
   getDailyBookingClickCounts,
 } from "@/lib/queries/booking";
 
-export const metadata: Metadata = { title: "Analytics — Careerwithkumar Admin" };
+export const metadata: Metadata = {
+  title: "Analytics — Careerwithkumar Admin",
+};
 
-export default async function AdminAnalyticsPage() {
+import { CampaignAnalytics } from "@/components/admin/campaign-analytics";
+export default async function AdminAnalyticsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ days?: string; source?: string }>;
+}) {
+  const filters = await searchParams;
+  const days = filters.days === "90" ? 90 : 30;
+  const source = [
+    "instagram",
+    "whatsapp",
+    "google",
+    "direct",
+    "other",
+  ].includes(filters.source || "")
+    ? filters.source!
+    : "";
   const [
     viewsToday,
     totalViews,
@@ -50,6 +68,7 @@ export default async function AdminAnalyticsPage() {
       internship: 0,
       remote: 0,
       walkin: 0,
+      apprenticeship: 0,
     })),
     getTopViewedJobs(5).catch(() => []),
     safeStat(getBookingClicksToday),
@@ -64,6 +83,7 @@ export default async function AdminAnalyticsPage() {
         Traffic and engagement across your published postings.
       </p>
 
+      <CampaignAnalytics days={days} source={source} />
       <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         <MetricCard label="Views today" value={formatCount(viewsToday)} />
         <MetricCard label="Views all-time" value={formatCount(totalViews)} />
@@ -101,7 +121,9 @@ export default async function AdminAnalyticsPage() {
       </div>
 
       <div className="mt-6 rounded-lg border border-border bg-surface p-5">
-        <h3 className="text-sm font-semibold text-text">Most viewed postings</h3>
+        <h3 className="text-sm font-semibold text-text">
+          Most viewed postings
+        </h3>
         {topJobs.length === 0 ? (
           <p className="mt-3 text-[13px] text-text-3">No views recorded yet.</p>
         ) : (
@@ -118,7 +140,9 @@ export default async function AdminAnalyticsPage() {
                   >
                     {job.title}
                   </Link>
-                  <p className="truncate text-[12px] text-text-3">{job.company}</p>
+                  <p className="truncate text-[12px] text-text-3">
+                    {job.company}
+                  </p>
                 </div>
                 <span className="shrink-0 text-[13px] font-semibold text-text">
                   {formatCount(job.view_count)}

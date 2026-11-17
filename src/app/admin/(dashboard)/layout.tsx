@@ -1,10 +1,12 @@
+import { connection } from "next/server";
 import { AdminSidebar } from "@/components/admin/sidebar";
 
-export default function AdminDashboardLayout({
+export default async function AdminDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  await connection();
   return (
     <div className="flex min-h-full flex-1">
       <AdminSidebar />

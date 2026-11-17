@@ -16,6 +16,8 @@ const COMPANY_LINKS = [
 ];
 
 const LEGAL_LINKS = [
+  { href: "/disclaimer", label: "Disclaimer" },
+  { href: "/internships", label: "Internships" },
   { href: "/privacy", label: "Privacy policy" },
   { href: "/terms", label: "Terms of use" },
   { href: "/contact?topic=scam", label: "Report a scam" },
@@ -35,8 +37,8 @@ export function Footer() {
         <div className="col-span-2">
           <Logo forceDark className="h-16 w-auto" />
           <p className="m-0 mt-3 max-w-sm text-[12.5px] leading-[1.7] text-[#9AA6BC]">
-            Verified career and job-update listings, cross-checked from
-            official sources. Followed by{" "}
+            Verified career and job-update listings, cross-checked from official
+            sources. Followed by{" "}
             {SITE_CONFIG.instagramFollowers.toLocaleString("en-IN")}+ job
             seekers on Instagram.
           </p>
@@ -48,7 +50,8 @@ export function Footer() {
               </h5>
               <div className="flex items-center gap-3">
                 {followLinks.map((link) => {
-                  const Icon = SOCIAL_ICONS[link.label as keyof typeof SOCIAL_ICONS];
+                  const Icon =
+                    SOCIAL_ICONS[link.label as keyof typeof SOCIAL_ICONS];
                   return (
                     <a
                       key={link.label}
@@ -102,7 +105,6 @@ export function Footer() {
             ))}
           </ul>
         </div>
-
       </div>
 
       <div className="border-t border-[#2C3E5C] px-5 py-3.5 text-center text-[11.5px] text-[#7C8AA3]">

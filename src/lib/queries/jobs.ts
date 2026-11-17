@@ -2,7 +2,12 @@ import { cache } from "react";
 import { unstable_cache } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createPublicClient } from "@/lib/supabase/public";
-import { JOB_LIST_COLUMNS, type JobCategory, type JobListItem, type JobPost } from "@/types/database";
+import {
+  JOB_LIST_COLUMNS,
+  type JobCategory,
+  type JobListItem,
+  type JobPost,
+} from "@/types/database";
 
 // PostgREST's or()/ilike() filter strings treat comma/parens as grammar and
 // % as our own wildcard — strip/escape them so a search term can't break or
@@ -24,7 +29,11 @@ export const getPublishedJobs = unstable_cache(
     const supabase = createPublicClient();
     let query = supabase
       .from("job_posts")
-      .select(JOB_LIST_COLUMNS)
+      .select(
+        process.env.PORTAL_SCHEMA_READY === "true"
+          ? JOB_LIST_COLUMNS
+          : "id, slug, title, company, location, category, source, salary, deadline_at, view_count, published_at, created_at",
+      )
       .eq("status", "published")
       .order("published_at", { ascending: false });
 
@@ -33,14 +42,16 @@ export const getPublishedJobs = unstable_cache(
     }
     if (opts?.search) {
       const term = sanitizeIlikeTerm(opts.search);
-      query = query.or(`title.ilike.%${term}%,company.ilike.%${term}%`);
+      query = query.or(
+        `title.ilike.%${term}%,company.ilike.%${term}%,description.ilike.%${term}%`,
+      );
     }
     if (opts?.location) {
       const term = sanitizeIlikeTerm(opts.location);
       query = query.ilike("location", `%${term}%`);
     }
 
-    const { data, error } = await query;
+    const { data, error } = await query.returns<JobListItem[]>();
     if (error) throw new Error(error.message);
     return data ?? [];
   },
@@ -73,7 +84,9 @@ export const getJobBySlug = cache(
 export const getRecentJobUpdates = unstable_cache(
   async (
     limit = 3,
-  ): Promise<Pick<JobListItem, "id" | "slug" | "title" | "published_at" | "created_at">[]> => {
+  ): Promise<
+    Pick<JobListItem, "id" | "slug" | "title" | "published_at" | "created_at">[]
+  > => {
     const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("job_posts")
@@ -98,12 +111,17 @@ export const getRelatedJobs = unstable_cache(
     const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("job_posts")
-      .select(JOB_LIST_COLUMNS)
+      .select(
+        process.env.PORTAL_SCHEMA_READY === "true"
+          ? JOB_LIST_COLUMNS
+          : "id, slug, title, company, location, category, source, salary, deadline_at, view_count, published_at, created_at",
+      )
       .eq("status", "published")
       .eq("category", category)
       .neq("id", excludeId)
       .order("published_at", { ascending: false })
-      .limit(limit);
+      .limit(limit)
+      .returns<JobListItem[]>();
 
     if (error) throw new Error(error.message);
     return data ?? [];

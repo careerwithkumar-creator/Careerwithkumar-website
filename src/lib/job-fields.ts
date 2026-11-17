@@ -1,0 +1,17 @@
+export const JOB_FIELDS = {
+  employment_type: "Employment type",
+  qualification: "Qualification",
+  eligible_batches: "Eligible batches / passing years",
+  age_limit: "Age limits",
+  experience_required: "Experience required",
+  skills: "Required skills",
+  selection_process: "Selection process",
+  application_fee: "Application fees",
+  required_documents: "Required documents",
+  application_steps: "How to apply",
+  eligibility_notes: "Important eligibility notes",
+  official_notification_url: "Official notification URL",
+  company_logo: "Company logo URL",
+  application_start_date: "Applications open",
+  vacancies: "Vacancies",
+} as const;

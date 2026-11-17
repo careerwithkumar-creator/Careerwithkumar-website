@@ -46,6 +46,8 @@ function sortJobs(jobs: JobListItem[], sortBy: SortKey): JobListItem[] {
 }
 
 export function JobResults({ jobs }: { jobs: JobListItem[] }) {
+  const [now] = useState(() => Date.now());
+  const [extraFilters, setExtraFilters] = useState<Record<string, string>>({});
   const [layout, setLayout] = useState<"grid" | "list">("grid");
   const [sortBy, setSortBy] = useState<SortKey>("newest");
   const [locationFilter, setLocationFilter] = useState("");
@@ -54,16 +56,39 @@ export function JobResults({ jobs }: { jobs: JobListItem[] }) {
   const [page, setPage] = useState(1);
 
   const locations = useMemo(() => {
-    const set = new Set(jobs.map((j) => j.location).filter((l): l is string => !!l));
+    const set = new Set(
+      jobs.map((j) => j.location).filter((l): l is string => !!l),
+    );
     return [...set].sort();
   }, [jobs]);
 
   const filtered = useMemo(() => {
     let result = jobs;
-    if (locationFilter) result = result.filter((j) => j.location === locationFilter);
-    if (categoryFilter) result = result.filter((j) => j.category === categoryFilter);
-    return sortJobs(result, sortBy);
-  }, [jobs, locationFilter, categoryFilter, sortBy]);
+    if (locationFilter)
+      result = result.filter((j) => j.location === locationFilter);
+    if (categoryFilter)
+      result = result.filter((j) => j.category === categoryFilter);
+    for (const key of [
+      "qualification",
+      "employment_type",
+      "experience_required",
+    ] as const) {
+      if (extraFilters[key])
+        result = result.filter((j) =>
+          j[key]?.toLowerCase().includes(extraFilters[key].toLowerCase()),
+        );
+    }
+    if (extraFilters.status)
+      result = result.filter(
+        (j) =>
+          (j.deadline_at && new Date(j.deadline_at).getTime() < now
+            ? "expired"
+            : "active") === extraFilters.status,
+      );
+    return sortJobs(result, sortBy).sort(
+      (a, b) => Number(!!b.featured) - Number(!!a.featured),
+    );
+  }, [jobs, locationFilter, categoryFilter, sortBy, extraFilters, now]);
 
   function updateLocationFilter(value: string) {
     setLocationFilter(value);
@@ -101,7 +126,9 @@ export function JobResults({ jobs }: { jobs: JobListItem[] }) {
               aria-pressed={layout === "grid"}
               aria-label="Grid view"
               className={`flex h-8 w-8 items-center justify-center rounded transition-colors ${
-                layout === "grid" ? "bg-blue-soft text-blue" : "text-text-3 hover:text-text"
+                layout === "grid"
+                  ? "bg-blue-soft text-blue"
+                  : "text-text-3 hover:text-text"
               }`}
             >
               <GridIcon className="h-4 w-4" />
@@ -112,7 +139,9 @@ export function JobResults({ jobs }: { jobs: JobListItem[] }) {
               aria-pressed={layout === "list"}
               aria-label="List view"
               className={`flex h-8 w-8 items-center justify-center rounded transition-colors ${
-                layout === "list" ? "bg-blue-soft text-blue" : "text-text-3 hover:text-text"
+                layout === "list"
+                  ? "bg-blue-soft text-blue"
+                  : "text-text-3 hover:text-text"
               }`}
             >
               <ListIcon className="h-4 w-4" />
@@ -154,7 +183,9 @@ export function JobResults({ jobs }: { jobs: JobListItem[] }) {
 
           <select
             value={categoryFilter}
-            onChange={(e) => updateCategoryFilter(e.target.value as JobCategory | "")}
+            onChange={(e) =>
+              updateCategoryFilter(e.target.value as JobCategory | "")
+            }
             className="hidden rounded-md border border-border bg-surface px-3 py-1.75 text-[13px] text-text-2 focus:border-blue focus:outline-none sm:block"
           >
             <option value="">All categories</option>
@@ -178,6 +209,38 @@ export function JobResults({ jobs }: { jobs: JobListItem[] }) {
         <SaveSearchButton />
       </div>
 
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {["qualification", "employment_type", "experience_required"].map(
+          (key) => (
+            <label key={key} className="text-xs">
+              {key.replaceAll("_", " ")}
+              <input
+                className="input mt-1"
+                value={extraFilters[key] || ""}
+                onChange={(ev) => {
+                  setExtraFilters({ ...extraFilters, [key]: ev.target.value });
+                  setPage(1);
+                }}
+              />
+            </label>
+          ),
+        )}
+        <label className="text-xs">
+          Application status
+          <select
+            className="input mt-1"
+            value={extraFilters.status || ""}
+            onChange={(ev) => {
+              setExtraFilters({ ...extraFilters, status: ev.target.value });
+              setPage(1);
+            }}
+          >
+            <option value="">All opportunities</option>
+            <option value="active">Active</option>
+            <option value="expired">Expired</option>
+          </select>
+        </label>
+      </div>
       <div className="mt-5">
         <JobFeed jobs={paginated} layout={layout} />
       </div>

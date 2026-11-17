@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { CategoryTag, DeadlineBadge } from "@/components/badges";
 import { AppliedButton } from "@/components/applied-button";
@@ -14,8 +15,21 @@ import {
   BriefcaseIcon,
 } from "@/components/icons";
 import { formatCount, formatRelativeTime } from "@/lib/format";
-import { getJobBySlug, getRelatedJobs, getPublishedJobs } from "@/lib/queries/jobs";
+import {
+  getJobBySlug,
+  getRelatedJobs,
+  getPublishedJobs,
+} from "@/lib/queries/jobs";
 
+import { JobTracking } from "@/components/job-tracking";
+import { JOB_FIELDS } from "@/lib/job-fields";
+import {
+  safeUrl,
+  expired,
+  jsonLd,
+  siteUrl as canonicalBase,
+} from "@/lib/portal";
+import { AdSlot } from "@/components/ad-slot";
 // Pre-render every currently-published job at build time, so the first
 // visitor to any job that already existed at deploy time gets a static page
 // instantly instead of triggering the render themselves. Jobs published
@@ -39,6 +53,17 @@ export async function generateMetadata({
   if (!job) return {};
 
   return {
+    alternates: { canonical: canonicalBase + "/jobs/" + job.slug },
+    openGraph: {
+      title: job.title,
+      description: job.description.slice(0, 155),
+      url: canonicalBase + "/jobs/" + job.slug,
+    },
+    twitter: {
+      card: "summary",
+      title: job.title,
+      description: job.description.slice(0, 155),
+    },
     title: `${job.title} — ${job.company} | Careerwithkumar`,
     description: job.description.slice(0, 155),
   };
@@ -54,16 +79,69 @@ export default async function JobDetailPage({
   if (!job) notFound();
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const closed = expired(job);
+  const officialUrl = safeUrl(job.apply_url);
+  const structured = {
+    "@context": "https://schema.org",
+    "@type": "JobPosting",
+    title: job.title,
+    description: job.description,
+    datePosted: job.published_at,
+    validThrough: job.deadline_at,
+    hiringOrganization: { "@type": "Organization", name: job.company },
+    jobLocation: {
+      "@type": "Place",
+      address: { "@type": "PostalAddress", addressLocality: job.location },
+    },
+    url: canonicalBase + "/jobs/" + job.slug,
+  };
   const relatedJobs = await getRelatedJobs(job.category, job.id);
 
   return (
     <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6">
+      {!closed && job.published_at && job.location && officialUrl && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLd(structured) }}
+        />
+      )}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Jobs",
+                item: canonicalBase + "/jobs",
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: job.title,
+                item: canonicalBase + "/jobs/" + job.slug,
+              },
+            ],
+          }),
+        }}
+      />
+      {closed && (
+        <p role="status" className="rounded-lg bg-amber-soft p-4">
+          Applications closed. This listing is retained for reference.
+        </p>
+      )}
       <nav className="text-sm text-text-3">
         <Link href="/jobs" className="hover:text-blue">
           All jobs
         </Link>
         {" / "}
-        <Link href={`/jobs?category=${job.category}`} className="hover:text-blue">
+        <Link
+          href={`/jobs?category=${job.category}`}
+          className="hover:text-blue"
+        >
           {job.category}
         </Link>
       </nav>
@@ -77,6 +155,17 @@ export default async function JobDetailPage({
           )}
         </div>
 
+        {safeUrl(job.company_logo) && (
+          <Image
+            unoptimized
+            src={safeUrl(job.company_logo)!}
+            alt={job.company + " logo"}
+            width={64}
+            height={64}
+            loading="lazy"
+            className="mt-3 h-16 w-16 rounded-lg object-contain"
+          />
+        )}
         <h1 className="mt-3 text-2xl font-bold text-text sm:text-3xl">
           {job.title}
         </h1>
@@ -113,9 +202,10 @@ export default async function JobDetailPage({
         </div>
 
         <div className="mt-6 flex flex-wrap items-center gap-3">
-          {job.apply_url && (
+          {officialUrl && !closed && (
             <a
-              href={job.apply_url}
+              data-official-apply
+              href={officialUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 rounded-md bg-blue px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-navy-2"
@@ -134,6 +224,13 @@ export default async function JobDetailPage({
         </p>
       </div>
 
+      <p className="mt-4 text-sm text-text-2">
+        CareerWithKumar is an independent career-information platform, not the
+        recruiting organization. Verify eligibility, fees and dates in the
+        official notification.
+      </p>
+      <JobTracking slug={job.slug} />
+      <AdSlot placement="introduction" />
       <div className="mt-6 grid gap-6 sm:grid-cols-3">
         <div className="sm:col-span-2">
           <section className="rounded-lg border border-border bg-surface p-5 sm:p-7">
@@ -153,10 +250,40 @@ export default async function JobDetailPage({
                 </p>
               </>
             )}
+            {Object.entries(JOB_FIELDS)
+              .filter(
+                ([key]) =>
+                  !["company_logo", "official_notification_url"].includes(key),
+              )
+              .map(([key, label]) => {
+                const value = job[key as keyof typeof job];
+                return value ? (
+                  <div key={key} className="mt-5">
+                    <h2 className="font-semibold">{label}</h2>
+                    <p className="whitespace-pre-line text-sm text-text-2">
+                      {String(value)}
+                    </p>
+                  </div>
+                ) : null;
+              })}
+            {safeUrl(job.official_notification_url) && (
+              <a
+                className="mt-4 block text-blue underline"
+                href={safeUrl(job.official_notification_url)!}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Read official notification
+              </a>
+            )}
           </section>
+          <AdSlot placement="details" />
 
           <div className="mt-5 flex items-center justify-between gap-4 rounded-lg border border-border-soft bg-bg px-4 py-3">
-            <ShareButtons title={job.title} url={`${siteUrl}/jobs/${job.slug}`} />
+            <ShareButtons
+              title={job.title}
+              url={`${siteUrl}/jobs/${job.slug}`}
+            />
             <ReportLinkButton jobId={job.id} />
           </div>
         </div>
