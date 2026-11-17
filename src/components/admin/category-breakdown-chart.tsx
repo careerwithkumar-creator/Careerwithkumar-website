@@ -6,6 +6,7 @@ import type { JobCategory } from "@/types/database";
 // weren't designed for side-by-side chart identity (govt/private share a hue
 // there).
 const SERIES_VAR: Record<JobCategory, string> = {
+  apprenticeship: "--series-3",
   govt: "--series-1",
   private: "--series-2",
   internship: "--series-3",

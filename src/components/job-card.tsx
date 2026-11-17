@@ -1,8 +1,17 @@
 import Link from "next/link";
 import type { JobListItem } from "@/types/database";
 import { SaveButton } from "@/components/save-button";
-import { CategoryTag, DeadlineBadge, URGENCY_TEXT_CLASS } from "@/components/badges";
-import { MapPinIcon, BriefcaseIcon, CalendarIcon, InfoIcon } from "@/components/icons";
+import {
+  CategoryTag,
+  DeadlineBadge,
+  URGENCY_TEXT_CLASS,
+} from "@/components/badges";
+import {
+  MapPinIcon,
+  BriefcaseIcon,
+  CalendarIcon,
+  InfoIcon,
+} from "@/components/icons";
 import { formatDate, getDeadlineInfo } from "@/lib/format";
 import { CATEGORY_META } from "@/lib/categories";
 
@@ -21,6 +30,16 @@ export function JobCard({ job }: { job: JobListItem }) {
         <SaveButton jobId={job.id} />
       </div>
 
+      {job.featured && (
+        <span className="text-xs font-semibold text-blue">
+          Featured opportunity
+        </span>
+      )}
+      {job.qualification && (
+        <p className="mt-2 text-xs text-text-2">
+          Eligibility: {job.qualification}
+        </p>
+      )}
       <p className="mt-2 text-[14px] text-text-2">{job.company}</p>
 
       <div className="mt-3 space-y-1.5 text-[13.5px] text-text-2">

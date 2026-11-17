@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { JobForm } from "@/components/admin/job-form";
 import { getJobById } from "@/lib/queries/jobs";
-import { updateJobPost } from "../../actions";
+import { duplicateJobPost, updateJobPost } from "../../actions";
 
-export const metadata: Metadata = { title: "Edit Posting — Careerwithkumar Admin" };
+export const metadata: Metadata = {
+  title: "Edit Posting — Careerwithkumar Admin",
+};
 
 export default async function EditJobPage({
   params,
@@ -22,6 +24,9 @@ export default async function EditJobPage({
       <h1 className="text-xl font-bold text-text">Edit posting</h1>
       <p className="mt-1 text-sm text-text-2">{job.title}</p>
 
+      <form action={duplicateJobPost.bind(null, id)} className="mt-4">
+        <button className="input">Duplicate as draft</button>
+      </form>
       <div className="mt-6">
         <JobForm
           action={boundAction}

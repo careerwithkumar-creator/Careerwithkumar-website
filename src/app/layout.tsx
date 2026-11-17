@@ -11,6 +11,12 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  other: {
+    "google-adsense-account": "ca-pub-7043118250580068",
+  },
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "https://careerwithkumar.in",
+  ),
   title: "Careerwithkumar — Job Updates & Career Notifications",
   description:
     "Verified job, internship, and walk-in notifications — govt, private, remote. No fee to apply, ever.",

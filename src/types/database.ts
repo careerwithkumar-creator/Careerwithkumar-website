@@ -1,8 +1,25 @@
-export type JobCategory = "govt" | "private" | "internship" | "remote" | "walkin";
+export type JobCategory =
+  "govt" | "private" | "internship" | "remote" | "walkin" | "apprenticeship";
 export type JobStatus = "draft" | "published" | "archived";
 export type JobSource = "manual" | "instagram";
 
 export type JobPost = {
+  employment_type?: string | null;
+  qualification?: string | null;
+  eligible_batches?: string | null;
+  age_limit?: string | null;
+  experience_required?: string | null;
+  skills?: string | null;
+  selection_process?: string | null;
+  application_fee?: string | null;
+  required_documents?: string | null;
+  application_steps?: string | null;
+  eligibility_notes?: string | null;
+  official_notification_url?: string | null;
+  company_logo?: string | null;
+  application_start_date?: string | null;
+  vacancies?: string | null;
+  featured?: boolean;
   id: string;
   slug: string;
   title: string;
@@ -31,6 +48,10 @@ export type JobPost = {
 // text — which the list UI never renders — down to the browser.
 export type JobListItem = Pick<
   JobPost,
+  | "featured"
+  | "qualification"
+  | "employment_type"
+  | "experience_required"
   | "id"
   | "slug"
   | "title"
@@ -46,7 +67,7 @@ export type JobListItem = Pick<
 >;
 
 export const JOB_LIST_COLUMNS =
-  "id, slug, title, company, location, category, source, salary, deadline_at, view_count, published_at, created_at";
+  "id, slug, title, company, location, category, source, salary, deadline_at, view_count, published_at, created_at, featured, qualification, employment_type, experience_required";
 
 export type PostView = {
   id: string;
@@ -122,6 +143,20 @@ export type BookingClickEvent = {
 export type Database = {
   public: {
     Tables: {
+      job_traffic_daily: {
+        Row: {
+          day: string;
+          job_post_id: string;
+          source: string;
+          campaign: string;
+          medium: string;
+          views: number;
+          apply_clicks: number;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
       job_posts: {
         Row: JobPost;
         Insert: Partial<JobPost> &
@@ -193,7 +228,18 @@ export type Database = {
       };
     };
     Views: Record<string, never>;
+    TablesUnused?: never;
     Functions: {
+      record_job_traffic: {
+        Args: {
+          p_slug: string;
+          p_source: string;
+          p_campaign: string;
+          p_medium: string;
+          p_apply: boolean;
+        };
+        Returns: undefined;
+      };
       record_post_view_by_slug: {
         Args: { p_slug: string; p_session_id: string };
         Returns: void;

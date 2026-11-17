@@ -1,11 +1,12 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useRef, useState } from "react";
 import Link from "next/link";
 import { CATEGORY_META, CATEGORY_ORDER } from "@/lib/categories";
 import type { JobFormState } from "@/app/admin/(dashboard)/jobs/actions";
 import type { JobPost } from "@/types/database";
 
+import { JOB_FIELDS } from "@/lib/job-fields";
 function toDateInputValue(iso: string | null | undefined) {
   if (!iso) return "";
   return iso.slice(0, 10);
@@ -24,10 +25,50 @@ export function JobForm({
     error: null,
   });
 
+  const formRef = useRef<HTMLFormElement>(null);
+  const [importError, setImportError] = useState("");
+  const [preview, setPreview] = useState<Record<string, string> | null>(null);
+  function importData(raw: string) {
+    try {
+      const data = JSON.parse(raw);
+      if (!data || Array.isArray(data) || typeof data !== "object")
+        throw Error();
+      for (const [key, value] of Object.entries(data)) {
+        const field = formRef.current?.elements.namedItem(key);
+        if (
+          (field instanceof HTMLInputElement ||
+            field instanceof HTMLTextAreaElement ||
+            field instanceof HTMLSelectElement) &&
+          typeof value === "string"
+        )
+          field.value = value;
+      }
+      setImportError(
+        "Imported. Verify every field against official sources before publishing.",
+      );
+    } catch {
+      setImportError("Paste a JSON object with matching field names.");
+    }
+  }
   const fieldError = (name: string) => state.fieldErrors?.[name];
 
   return (
-    <form action={formAction} className="max-w-2xl space-y-5">
+    <form ref={formRef} action={formAction} className="max-w-2xl space-y-5">
+      <details className="rounded-lg border border-border p-4">
+        <summary>Paste structured job information (JSON)</summary>
+        <textarea
+          aria-label="Structured job JSON"
+          className="input mt-3"
+          rows={4}
+          onBlur={(e) => {
+            if (e.target.value.trim()) importData(e.target.value);
+          }}
+          placeholder={
+            '{"title":"Job title","company":"Employer","description":"Original summary"}'
+          }
+        />
+        <p role="status">{importError}</p>
+      </details>
       {state.error && (
         <p className="rounded-md bg-red-soft px-3 py-2 text-sm text-red">
           {state.error}
@@ -127,6 +168,90 @@ export function JobForm({
         />
       </Field>
 
+      <label className="block text-sm">
+        Upload company logo (PNG, JPEG, WebP; max 2 MB)
+        <input
+          type="file"
+          accept="image/png,image/jpeg,image/webp"
+          onChange={async (ev) => {
+            const file = ev.target.files?.[0];
+            if (!file) return;
+            const data = new FormData();
+            data.set("logo", file);
+            try {
+              const response = await fetch("/api/admin/logo", {
+                method: "POST",
+                body: data,
+              });
+              const result = await response.json();
+              if (!response.ok) throw Error(result.error);
+              const input = formRef.current?.elements.namedItem("company_logo");
+              if (input instanceof HTMLTextAreaElement)
+                input.value = result.url;
+              setImportError("Logo uploaded. Save the listing to attach it.");
+            } catch {
+              setImportError(
+                "Logo upload failed. Verify the storage migration, admin access and file format.",
+              );
+            }
+          }}
+        />
+      </label>
+      <fieldset className="grid gap-4 sm:grid-cols-2">
+        <legend className="mb-3 font-semibold">
+          Verified opportunity details
+        </legend>
+        {Object.entries(JOB_FIELDS).map(([key, label]) => (
+          <Field key={key} label={label} error={fieldError(key)}>
+            <textarea
+              name={key}
+              defaultValue={
+                initialValues?.[key as keyof JobPost]?.toString() ?? ""
+              }
+              rows={2}
+              className="input"
+            />
+          </Field>
+        ))}
+        <label>
+          <input
+            name="featured"
+            type="checkbox"
+            defaultChecked={initialValues?.featured}
+          />{" "}
+          Featured opportunity
+        </label>
+        <label>
+          <input name="verified" type="checkbox" required /> I verified the
+          information and official links.
+        </label>
+      </fieldset>
+      <button
+        type="button"
+        className="input"
+        onClick={() =>
+          setPreview(
+            Object.fromEntries(
+              Array.from(new FormData(formRef.current!).entries()).map(
+                ([k, v]) => [k, String(v)],
+              ),
+            ),
+          )
+        }
+      >
+        Preview before saving
+      </button>
+      {preview && (
+        <section className="rounded-lg border border-border p-4">
+          <h2>Preview</h2>
+          {Object.entries(preview).map(([k, v]) => (
+            <p key={k} className="whitespace-pre-line text-sm">
+              <strong>{k}: </strong>
+              {v}
+            </p>
+          ))}
+        </section>
+      )}
       <div className="flex items-center gap-3">
         <button
           type="submit"

@@ -4,6 +4,10 @@ export const CATEGORY_META: Record<
   JobCategory,
   { label: string; tagClass: string }
 > = {
+  apprenticeship: {
+    label: "Apprenticeship",
+    tagClass: "bg-blue-soft text-blue",
+  },
   govt: { label: "Government", tagClass: "bg-blue-soft text-blue" },
   private: { label: "Private", tagClass: "bg-blue-soft text-blue" },
   internship: { label: "Internship", tagClass: "bg-purple-soft text-purple" },
@@ -12,6 +16,7 @@ export const CATEGORY_META: Record<
 };
 
 export const CATEGORY_ORDER: JobCategory[] = [
+  "apprenticeship",
   "govt",
   "private",
   "internship",

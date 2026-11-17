@@ -1,7 +1,7 @@
 import { SearchBanner } from "@/components/search-banner";
 import { JobResults } from "@/components/job-results";
 import { JobsSidebar } from "@/components/jobs-sidebar";
-import { TrustStrip } from "@/components/trust-strip";
+
 import { InstagramFollowStrip } from "@/components/instagram-follow-strip";
 import { FaqSection } from "@/components/faq-section";
 import { getPublishedJobs, getRecentJobUpdates } from "@/lib/queries/jobs";
